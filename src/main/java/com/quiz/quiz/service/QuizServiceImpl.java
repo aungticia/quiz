@@ -3,9 +3,12 @@ package com.quiz.quiz.service;
 import com.quiz.quiz.model.Question;
 import com.quiz.quiz.model.QuestionWrapper;
 import com.quiz.quiz.model.Quiz;
+import com.quiz.quiz.model.Response;
 import com.quiz.quiz.repository.QuestionRepo;
 import com.quiz.quiz.repository.QuizRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,5 +49,18 @@ public class QuizServiceImpl implements QuizService{
                     q.getOption1(), q.getOption2(), q.getOption3(), q.getOption4()));
         }
         return questionsForUser;
+    }
+
+    public ResponseEntity<Integer> calculateResult(Integer id, List<Response> responses) {
+        Quiz quiz = quizRepo.findById(id).get();
+        List<Question> questions = quiz.getQuestions();
+        int right = 0;
+        int i = 0;
+        for(Response response : responses){
+            if(response.getResponse().equals(questions.get(i).getCorrectAnswer()))
+                right++;
+            i++;
+        }
+        return new ResponseEntity<>(right, HttpStatus.OK);
     }
 }
